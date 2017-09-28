@@ -1,6 +1,6 @@
 # DOTFILES REPOSITORY
 
-## Create Symbolic Link
+## Create Link
 
 FOR EXAMPLE:
 ```
