@@ -96,6 +96,9 @@ Plug 'fleischie/vim-styled-components'
 " Syntaxチェック"
 Plug 'vim-syntastic/syntastic'
 
+" VimでTwitter
+Plug 'twitvim/twitvim'
+
 call plug#end()
 
 
@@ -106,6 +109,9 @@ call plug#end()
 noremap j gj
 noremap k gk
 nnoremap == gg=G''
+
+" 日付を入力するコマンド
+nmap <C-o><C-o> <ESC>a<C-r>=strftime("[%Y/%m/%d(%a) %H:%M]")<CR><ESC>
 
 " Pasteの挙動変更
 vnoremap <silent> p "0p
@@ -232,15 +238,49 @@ autocmd QuickFixCmdPost *grep* cwindow
 " NERDTree設定
 """"""""""""""""""""""""""""""
 " NERDTreeを開く
-nnoremap <silent><C-e> :NERDTreeToggle<CR>
+nnoremap <silent><C-n> :NERDTreeToggle<CR>
 
 " NERDTreeをVim起動時に自動的に開く
 " autocmd vimenter * NERDTree
+
 " ファイル指定なしでVimを起動した場合だけ表示
-" autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+
 " NERD Treeのウィンドウだけが残るような場合にVimを終了
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
+" ブックマークを初期表示
+let g:NERDTreeShowBookmarks=1
+
+" .ファイルを表示
+" let NERDTreeShowHidden=1
+
+" NERDTress File highlighting
+function! NERDTreeHighlightFile(extension, fg, bg, guifg, guibg)
+ exec 'autocmd filetype nerdtree highlight ' . a:extension .' ctermbg='. a:bg .' ctermfg='. a:fg .' guibg='. a:guibg .' guifg='. a:guifg
+ exec 'autocmd filetype nerdtree syn match ' . a:extension .' #^\s\+.*'. a:extension .'$#'
+endfunction
+call NERDTreeHighlightFile('py',     'yellow',  'none', 'yellow',  '#151515')
+call NERDTreeHighlightFile('md',     'blue',    'none', '#3366FF', '#151515')
+call NERDTreeHighlightFile('yml',    'yellow',  'none', 'yellow',  '#151515')
+call NERDTreeHighlightFile('config', 'yellow',  'none', 'yellow',  '#151515')
+call NERDTreeHighlightFile('conf',   'yellow',  'none', 'yellow',  '#151515')
+call NERDTreeHighlightFile('json',   'yellow',  'none', 'yellow',  '#151515')
+call NERDTreeHighlightFile('html',   'yellow',  'none', 'yellow',  '#151515')
+call NERDTreeHighlightFile('styl',   'cyan',    'none', 'cyan',    '#151515')
+call NERDTreeHighlightFile('css',    'cyan',    'none', 'cyan',    '#151515')
+call NERDTreeHighlightFile('rb',     'Red',     'none', 'red',     '#151515')
+call NERDTreeHighlightFile('js',     'Red',     'none', '#ffa500', '#151515')
+call NERDTreeHighlightFile('php',    'Magenta', 'none', '#ff00ff', '#151515')
+call NERDTreeHighlightFile('jade', 'green', 'none', 'green', '#151515')
+call NERDTreeHighlightFile('slim', 'green', 'none', 'green', '#151515')
+call NERDTreeHighlightFile('erb', 'green', 'none', 'green', '#151515')
+call NERDTreeHighlightFile('haml', 'green', 'none', 'green', '#151515')
+call NERDTreeHighlightFile('coffee', '5', 'none', '#ff00ff', '#151515')
+call NERDTreeHighlightFile('less', '5', 'none', '#ff00ff', '#151515')
+call NERDTreeHighlightFile('scss', '5', 'none', '#ff00ff', '#151515')
+call NERDTreeHighlightFile('sass', '5', 'none', '#ff00ff', '#151515')
+call NERDTreeHighlightFile('ini', 'yellow', 'none', 'yellow', '#151515')
 """"""""""""""""""""""""""""""
 " 全角スペースの表示
 """"""""""""""""""""""""""""""
@@ -399,6 +439,8 @@ command! SyntaxInfo call s:get_syn_info()
 """"""""""""""""""""""""""""""""""""""""""""""""""
 " SETTING
 let g:ctrlp_clear_cache_on_exit = 0
+let g:ctrlp_max_files = 100000 " 最大ファイル数(default: 10000)
+let g:ctrlp_max_depth = 10 " 最大階層数(default: 40)
 let g:ctrlp_mruf_max = 500
 let g:ctrlp_max_height = 20
 let g:ctrlp_open_new_file = 'r'
@@ -419,6 +461,16 @@ nnoremap sc :<C-u>CtrlPClearCache<CR>:<C-u>CtrlP<CR>
 " https://github.com/vim-jp/issues/issues/1076
 """"""""""""""""""""""""""""""
 set redrawtime=10000
+
+""""""""""""""""""""""""""""""""""""""""""""""""""
+" EMMETのキーバインドを変更
+""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:user_emmet_leader_key = '<C-e>'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""
+" Twitvim
+""""""""""""""""""""""""""""""""""""""""""""""""""
+nnoremap tp :<C-u>PosttoTwitter<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""
 " ファイルタイプ関連を有効にする
