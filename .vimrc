@@ -20,6 +20,9 @@ Plug 'tpope/vim-bundler'
 " Ruby向けにendを自動挿入してくれる
 Plug 'tpope/vim-endwise'
 
+" Git
+Plug 'tpope/vim-fugitive'
+
 " シングルクオートとダブルクオートの入れ替え等
 Plug 'tpope/vim-surround'
 
@@ -101,7 +104,6 @@ Plug 'twitvim/twitvim'
 
 call plug#end()
 
-
 """"""""""""""""""""""""""""""
 " 各種オプションの設定
 """"""""""""""""""""""""""""""
@@ -112,6 +114,9 @@ nnoremap == gg=G''
 
 " 日付を入力するコマンド
 nmap <C-o><C-o> <ESC>a<C-r>=strftime("[%Y/%m/%d(%a) %H:%M]")<CR><ESC>
+
+" newtab
+nnoremap tn :<C-u>tabnew<CR>
 
 " Pasteの挙動変更
 vnoremap <silent> p "0p
@@ -145,7 +150,7 @@ set laststatus=2
 " ステータス行に表示させる情報の指定
 set statusline=%<%f\ %m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%l,%c%V%8P
 " ステータス行に現在のgitブランチを表示する
-set statusline+=%{fugitive#statusline()}
+" set statusline+=%{fugitive#statusline()}
 " ウインドウのタイトルバーにファイルのパス情報等を表示する
 set title
 " コマンドラインモードで<Tab>キーによるファイル名補完を有効にする
@@ -244,7 +249,7 @@ nnoremap <silent><C-n> :NERDTreeToggle<CR>
 " autocmd vimenter * NERDTree
 
 " ファイル指定なしでVimを起動した場合だけ表示
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+" autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
 " NERD Treeのウィンドウだけが残るような場合にVimを終了
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
@@ -260,18 +265,18 @@ function! NERDTreeHighlightFile(extension, fg, bg, guifg, guibg)
  exec 'autocmd filetype nerdtree highlight ' . a:extension .' ctermbg='. a:bg .' ctermfg='. a:fg .' guibg='. a:guibg .' guifg='. a:guifg
  exec 'autocmd filetype nerdtree syn match ' . a:extension .' #^\s\+.*'. a:extension .'$#'
 endfunction
-call NERDTreeHighlightFile('py',     'yellow',  'none', 'yellow',  '#151515')
-call NERDTreeHighlightFile('md',     'blue',    'none', '#3366FF', '#151515')
-call NERDTreeHighlightFile('yml',    'yellow',  'none', 'yellow',  '#151515')
-call NERDTreeHighlightFile('config', 'yellow',  'none', 'yellow',  '#151515')
-call NERDTreeHighlightFile('conf',   'yellow',  'none', 'yellow',  '#151515')
-call NERDTreeHighlightFile('json',   'yellow',  'none', 'yellow',  '#151515')
-call NERDTreeHighlightFile('html',   'yellow',  'none', 'yellow',  '#151515')
-call NERDTreeHighlightFile('styl',   'cyan',    'none', 'cyan',    '#151515')
-call NERDTreeHighlightFile('css',    'cyan',    'none', 'cyan',    '#151515')
-call NERDTreeHighlightFile('rb',     'Red',     'none', 'red',     '#151515')
-call NERDTreeHighlightFile('js',     'Red',     'none', '#ffa500', '#151515')
-call NERDTreeHighlightFile('php',    'Magenta', 'none', '#ff00ff', '#151515')
+call NERDTreeHighlightFile('py', 'yellow', 'none', 'yellow', '#151515')
+call NERDTreeHighlightFile('md', 'blue', 'none', '#3366FF', '#151515')
+call NERDTreeHighlightFile('yml', 'yellow', 'none', 'yellow', '#151515')
+call NERDTreeHighlightFile('config', 'yellow',  'none', 'yellow', '#151515')
+call NERDTreeHighlightFile('conf', 'yellow', 'none', 'yellow', '#151515')
+call NERDTreeHighlightFile('json', 'yellow', 'none', 'yellow', '#151515')
+call NERDTreeHighlightFile('html', 'yellow', 'none', 'yellow', '#151515')
+call NERDTreeHighlightFile('styl', 'cyan', 'none', 'cyan', '#151515')
+call NERDTreeHighlightFile('css', 'cyan', 'none', 'cyan', '#151515')
+call NERDTreeHighlightFile('rb', 'Red', 'none', 'red',  '#151515')
+call NERDTreeHighlightFile('js', 'Red', 'none', '#ffa500', '#151515')
+call NERDTreeHighlightFile('php', 'Magenta', 'none', '#ff00ff', '#151515')
 call NERDTreeHighlightFile('jade', 'green', 'none', 'green', '#151515')
 call NERDTreeHighlightFile('slim', 'green', 'none', 'green', '#151515')
 call NERDTreeHighlightFile('erb', 'green', 'none', 'green', '#151515')
@@ -472,6 +477,111 @@ let g:user_emmet_leader_key = '<C-e>'
 """"""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap tp :<C-u>PosttoTwitter<CR>
 
+""""""""""""""""""""""""""""""""""""""""""""""""""
+" Tab
+" http://thinca.hatenablog.com/entry/20111204/1322932585
+" http://vim-jp.org/vimdoc-ja/tabpage.html#setting-tabline
+""""""""""""""""""""""""""""""""""""""""""""""""""
+" タブページを常に表示
+set showtabline=2
+" gVimでもテキストベースのタブページを使う
+set guioptions-=e
+
+" Tip: set tablineはlightlineが有効になっている状態では反映されない
+
+""""""""""""""""""""""""""""""""""""""""""""""""""
+" lightline.vim
+" https://gist.github.com/note103/4efce80fa78ec19111b7e12de3aaa000
+""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:lightline = {
+        \ 'colorscheme': 'seoul256',
+        \ 'mode_map': {'c': 'NORMAL'},
+        \ 'active': {
+        \   'right': [ [ 'syntastic', 'lineinfo' ],
+        \              [ 'percent' ], [ 'winform' ],
+        \              [ 'fileformat', 'fileencoding', 'filetype' ] ],
+        \   'left': [ [ 'mode', 'paste' ], [ 'fugitive', 'branch', 'filename' ] ]
+        \ },
+        \ 'component_function': {
+        \   'linetotal': 'LightLineTotal',
+        \   'modified': 'LightLineModified',
+        \   'readonly': 'LightLineReadonly',
+        \   'fugitive': 'LightLineFugitive',
+        \   'filename': 'LightLineFilename',
+        \   'filepath': 'LightLineFilepath',
+        \   'fileformat': 'LightLineFileformat',
+        \   'filetype': 'LightLineFiletype',
+        \   'fileencoding': 'LightLineFileencoding',
+        \   'mode': 'LightLineMode',
+        \   'winform': 'LightLineWinform'
+        \ },
+        \ 'component_expand': {
+        \   'syntastic': 'SyntasticStatuslineFlag',
+        \ },
+        \ 'component_type': {
+        \   'syntastic': 'error',
+        \ }
+        \ }
+
+let g:lightline.component = {
+    \ 'lineinfo': '%3l[%L]:%-2v'}
+
+function! LightLineWinform()
+  return winwidth(0) > 50 ? 'w' . winwidth(0) . ':' . 'h' . winheight(0) : ''
+endfunction
+
+function! LightLineModified()
+  return &ft =~ 'help\|vimfiler\|gundo' ? '' : &modified ? '+' : &modifiable ? '' : '-'
+endfunction
+
+function! LightLineReadonly()
+  return &ft !~? 'help\|vimfiler\|gundo' && &readonly ? "⭤" : ''
+endfunction
+
+function! LightLineFilename()
+  return ('' != LightLineReadonly() ? LightLineReadonly() . ' ' : '') .
+        \ (&ft == 'vimfiler' ? vimfiler#get_status_string() :
+        \  &ft == 'unite' ? unite#get_status_string() :
+        \  &ft == 'vimshell' ? vimshell#get_status_string() :
+        \ '' != expand('%') && winwidth(0) <=120 ? expand('%:t') : winwidth(0) >120 ? expand('%:p') : '[No Name]') .
+        \ ('' != LightLineModified() ? ' ' . LightLineModified() : '')
+endfunction
+
+function! LightLineFilepath()
+  return winwidth(0) <=120 ? expand('%:h') : ''
+endfunction
+
+function! LightLineFugitive()
+  try
+    if &ft !~? 'vimfiler\|gundo' && exists('*fugitive#head') && winwidth(0) > 55
+      let _ = fugitive#head()
+      return strlen(_) ? '⭠ '._ : ''
+    endif
+  catch
+  endtry
+  return ''
+endfunction
+
+function! LightLineFileformat()
+  return winwidth(0) > 80 ? &fileformat : ''
+endfunction
+
+function! LightLineFiletype()
+  return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype : 'no ft') : ''
+endfunction
+
+function! LightLineFileencoding()
+  return winwidth(0) > 60 ? (strlen(&fenc) ? &fenc : &enc) : ''
+endfunction
+
+function! LightLineMode()
+  return winwidth(0) > 30 ? lightline#mode() : ''
+endfunction
+
+function! s:syntastic()
+  SyntasticCheck
+  call lightline#update()
+endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""
 " ファイルタイプ関連を有効にする
 """"""""""""""""""""""""""""""""""""""""""""""""""
