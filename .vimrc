@@ -55,6 +55,7 @@ Plug 'rking/ag.vim'
 Plug 'w0ng/vim-hybrid'
 Plug 'chriskempson/vim-tomorrow-theme'
 Plug 'aereal/vim-colors-japanesque'
+Plug 'morhetz/gruvbox'
 
 " Syntax
 " インデントの設定は最後あたりに
@@ -158,7 +159,7 @@ set wildmenu
 " 入力中のコマンドを表示する
 set showcmd
 " バックアップディレクトリの指定
-set backupdir=$HOME/.vimbackup
+" set backupdir=$HOME/.vimbackup
 " バッファで開いているファイルのディレクトリでエクスクローラを開始する
 set browsedir=buffer
 " 小文字のみで検索したときに大文字小文字を無視する
@@ -366,6 +367,9 @@ nnoremap <silent> <Space><Space> "zyiw:let @/ = '\<' . @z . '\>'<CR>:set hlsearc
 " カーソル下の単語をハイライトしてから置換する
 nmap # <Space><Space>:%s/<C-r>///g<Left><Left>
 
+" 「"」や「'」の中身だけ取り出してあとは捨てる
+nnoremap s' :v/\("\\|'\)\zs.*\ze\("\\|'\)/ s/.*//g<CR>:%s/^.\{-}\("\\|'\)//g<CR>:%s/\("\\|'\).*//g<CR>:%s/\s*$<CR>:v/./d<CR>
+
 " ビジュアルモードでもハイライト・置換
 xnoremap <silent> <Space> mz:call <SID>set_vsearch()<CR>:set hlsearch<CR>`z
 xnoremap * :<C-u>call <SID>set_vsearch()<CR>/<C-r>/<CR>
@@ -483,7 +487,7 @@ nnoremap tp :<C-u>PosttoTwitter<CR>
 " http://vim-jp.org/vimdoc-ja/tabpage.html#setting-tabline
 """"""""""""""""""""""""""""""""""""""""""""""""""
 " タブページを常に表示
-set showtabline=2
+" set showtabline=2
 " gVimでもテキストベースのタブページを使う
 set guioptions-=e
 
@@ -494,7 +498,7 @@ set guioptions-=e
 " https://gist.github.com/note103/4efce80fa78ec19111b7e12de3aaa000
 """"""""""""""""""""""""""""""""""""""""""""""""""
 let g:lightline = {
-        \ 'colorscheme': 'seoul256',
+        \ 'colorscheme': 'jellybeans',
         \ 'mode_map': {'c': 'NORMAL'},
         \ 'active': {
         \   'right': [ [ 'syntastic', 'lineinfo' ],
@@ -535,7 +539,7 @@ function! LightLineModified()
 endfunction
 
 function! LightLineReadonly()
-  return &ft !~? 'help\|vimfiler\|gundo' && &readonly ? "⭤" : ''
+  return &ft !~? 'help\|vimfiler\|gundo' && &readonly ? "" : ''
 endfunction
 
 function! LightLineFilename()
@@ -555,7 +559,7 @@ function! LightLineFugitive()
   try
     if &ft !~? 'vimfiler\|gundo' && exists('*fugitive#head') && winwidth(0) > 55
       let _ = fugitive#head()
-      return strlen(_) ? '⭠ '._ : ''
+      return strlen(_) ? ' '._ : ''
     endif
   catch
   endtry
@@ -582,6 +586,17 @@ function! s:syntastic()
   SyntasticCheck
   call lightline#update()
 endfunction
+
+"""""""""""""""""""""""""""""""""""""""""""""""""
+" set
+" http://vimblog.hatenablog.com/entry/vimrc_set_recommended_options
+"""""""""""""""""""""""""""""""""""""""""""""""""
+set confirm    " 保存されていないファイルがあるときは終了前に保存確認
+set hidden     " 保存されていないファイルがあるときでも別のファイルを開くことが出来る
+set autoread   "外部でファイルに変更がされた場合は読みなおす
+set nobackup   " ファイル保存時にバックアップファイルを作らない
+set noswapfile " ファイル編集中にスワップファイルを作らない
+
 """"""""""""""""""""""""""""""""""""""""""""""""""
 " ファイルタイプ関連を有効にする
 """"""""""""""""""""""""""""""""""""""""""""""""""
